@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#81D2CA</color>
+    <color name="colorPrimaryDark">#014B40</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <color name="bottomsheet_background">#edfcff</color>
+    <color name="element_background">#b4fcff</color>
+</resources>

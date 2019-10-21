@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">LocalTransport</string>
+    <string name="name_bus_stop">МИЭТ</string>
+    <string name="kovrov">Kovrov</string>
+    <string name="ulyanovsk">Ulyanovsk</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyDgpzsgOoWayWYLURuK8m2STyhxRtBrrlw</string>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+            android:id="@+id/action_kovrov"
+            android:icon="@android:drawable/btn_star_big_on"
+            android:title="@string/kovrov" />
+    <item
+            android:id="@+id/action_ulsk"
+            android:icon="@android:drawable/btn_star_big_on"
+            android:title="@string/ulyanovsk" />
+</menu>
