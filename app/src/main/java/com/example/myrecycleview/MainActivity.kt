@@ -29,6 +29,13 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottom_sheet.*
 import kotlinx.android.synthetic.main.main_content.*
+import com.google.firebase.firestore.FirebaseFirestore
+import androidx.core.app.ComponentActivity
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.util.Log
+
 
 class MainActivity : AppCompatActivity(), View.OnClickListener,
     //Интерфейсы для карт
@@ -45,7 +52,25 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
     //Для данных
     private lateinit var linearLayoutManager: LinearLayoutManager
     private val persons = arrayListOf<Person>()
+    //инстанс базы данных , точка входа в работу с firebase
+    val db = FirebaseFirestore.getInstance()
+
+
+
     private fun initializeData() {
+        //получаем данные из firestore
+        val docRef = db.collection("busstop_1").document("Sun")
+        docRef.get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    Log.d("exist", "DocumentSnapshot data: ${document.data}")
+                } else {
+                    Log.d("noexist", "No such document")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("errordb", "get failed with ", exception)
+            }
 
         persons.add(Person("Хаски из Аляски","Ему 5 лет,а тебе?))",R.drawable.husky))
         persons.add(Person("Помираниан (как помираниум, только шпиц)","Ему 6 лет,а тебе?))",R.drawable.pomeranian))
@@ -119,6 +144,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         mMap.addMarker(MarkerOptions().position(miet).title("Остановка МИЭТ"))
         //Наведение камеры на маркер и приближение
         //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 12.0f))
+        val qwe = LatLng(55.983374, 37.210926)
+        mMap.addMarker(MarkerOptions().position(qwe).title("Остановка qwe"))
 
         //Подключение элементов управления масштабом на карте
         mMap.uiSettings.isZoomControlsEnabled = true

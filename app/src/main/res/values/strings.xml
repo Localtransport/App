@@ -3,5 +3,5 @@
     <string name="name_bus_stop">МИЭТ</string>
     <string name="kovrov">Kovrov</string>
     <string name="ulyanovsk">Ulyanovsk</string>
-    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyDgpzsgOoWayWYLURuK8m2STyhxRtBrrlw</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyC5iKqA18cuBgDFx_EMoJAtMovbod--oKM</string>
 </resources>
