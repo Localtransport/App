@@ -73,15 +73,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
             println("Cords of ${it.get("name")} is ${it.get("cords")}")
         }
         */
-        var i= 0
+        //получение всех остановок
         busstop.get().addOnSuccessListener {
             it.forEach {
-                // val buff = Busstop(it.get("name").toString(), it.get("cords").toString())
-                busStops.add(Busstop(it.get("name").toString(), it.get("cords") as GeoPoint))
+                val buff = Busstop(it.get("name").toString(), it.get("cords") as GeoPoint)
+                setBusstopOnMap(buff)//ставим остановку на карту
+                busStops.add(buff)//добавляем остановку в лист
                 // println("In BUFF Cords of ${buff.name} is ${buff.cords}")
-                println("In list Cords of ${busStops[i].name} is ${busStops[i].cords}")
+                println("In list Cords of ${busStops.last().name} is ${busStops.last().cords}")
                 println("Cords of ${it.get("name")} is ${it.get("cords")}")
-                i++
             }
         }
     }
@@ -106,7 +106,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         setContentView(R.layout.activity_main)
 
         initializeData()
-        initializeDatabase()
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+        //Получение запроса о последнем известном местоположении
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        //initializeDatabase()
         linearLayoutManager = LinearLayoutManager(this)
         rv.apply {
             setHasFixedSize(true)//размер RecyclerView не будет изменяться
@@ -115,12 +122,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         }
 
         initBottomSheet()
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
-        //Получение запроса о последнем известном местоположении
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
     }
     //Работа с картами
@@ -129,6 +130,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         slideUpDownBottomSheet()
         return false
     }
+    //Подключение карты
     private fun setUpMap() {
         //Проверка, есть ли у нас права на доступ к местоположению пользователя
         if (ActivityCompat.checkSelfPermission(this,
@@ -149,6 +151,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         val markerOptions = MarkerOptions().position(location)
         //Добавление маркера на карту
         mMap.addMarker(markerOptions)
+    }
+    //Добавление маркера остановки на карту
+    private fun setBusstopOnMap (bStop: Busstop)
+    {
+        val b = LatLng(bStop.cords.latitude, bStop.cords.longitude)
+        mMap.addMarker(MarkerOptions().position(b).title(bStop.name))
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
