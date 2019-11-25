@@ -35,6 +35,7 @@ import androidx.core.app.ComponentActivity.ExtraData
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.util.Log
+import com.google.firebase.firestore.GeoPoint
 
 
 class MainActivity : AppCompatActivity(), View.OnClickListener,
@@ -52,26 +53,40 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
     //Для данных
     private lateinit var linearLayoutManager: LinearLayoutManager
     private val persons = arrayListOf<Person>()
-    //инстанс базы данных , точка входа в работу с firebase
-    val db = FirebaseFirestore.getInstance()
+    private val busStops = mutableListOf<Busstop>()
 
-
+    private fun initializeDatabase()
+    {
+        val db = FirebaseFirestore.getInstance()
+        val busstop = db.collection("busstop")
+        /*//добавление документа в коллекцию
+        //(остановки в БД)
+        busstop.document("Student")
+            .set(mapOf(
+            "cords" to "55.881708, 37.207049",
+            "name" to "Студенческая",
+            "town" to "Zel"
+        ))*/
+        /*//получение информации из документа student
+        val stopStudent = busstop.document("Student")
+        stopStudent.get().addOnSuccessListener {
+            println("Cords of ${it.get("name")} is ${it.get("cords")}")
+        }
+        */
+        var i= 0
+        busstop.get().addOnSuccessListener {
+            it.forEach {
+                // val buff = Busstop(it.get("name").toString(), it.get("cords").toString())
+                busStops.add(Busstop(it.get("name").toString(), it.get("cords") as GeoPoint))
+                // println("In BUFF Cords of ${buff.name} is ${buff.cords}")
+                println("In list Cords of ${busStops[i].name} is ${busStops[i].cords}")
+                println("Cords of ${it.get("name")} is ${it.get("cords")}")
+                i++
+            }
+        }
+    }
 
     private fun initializeData() {
-        //получаем данные из firestore
-        val docRef = db.collection("busstop_1").document("Sun")
-        docRef.get()
-            .addOnSuccessListener { document ->
-                if (document != null) {
-                    Log.d("exist", "DocumentSnapshot data: ${document.data}")
-                } else {
-                    Log.d("noexist", "No such document")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d("errordb", "get failed with ", exception)
-            }
-
         persons.add(Person("Хаски из Аляски","Ему 5 лет,а тебе?))",R.drawable.husky))
         persons.add(Person("Помираниан (как помираниум, только шпиц)","Ему 6 лет,а тебе?))",R.drawable.pomeranian))
         persons.add(Person("Шипдог (как шиппер,только собака; или как корабль ","Ему 7 лет,а тебе?))",R.drawable.sheepdog))
@@ -91,15 +106,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         setContentView(R.layout.activity_main)
 
         initializeData()
+        initializeDatabase()
         linearLayoutManager = LinearLayoutManager(this)
         rv.apply {
             setHasFixedSize(true)//размер RecyclerView не будет изменяться
             layoutManager = linearLayoutManager
             adapter = MyRecyclerAdapter(persons)
         }
-        //Вызов функции,которая собирает футор - в разработке
-        initBottomSheet()
 
+        initBottomSheet()
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
