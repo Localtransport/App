@@ -26,6 +26,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottom_sheet.*
 import kotlinx.android.synthetic.main.main_content.*
@@ -45,6 +46,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
     //Для данных
     private lateinit var linearLayoutManager: LinearLayoutManager
     private val persons = arrayListOf<Person>()
+    private val busStops = mutableListOf<Busstop>()
     private fun initializeData() {
 
         persons.add(Person("Хаски из Аляски","Ему 5 лет,а тебе?))",R.drawable.husky))
@@ -61,11 +63,43 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         persons.add(Person("Вжух,вжух","Ему 5 лет",R.drawable.springer))
     }
 
+    private fun initializeDatabase()
+    {
+        val db = FirebaseFirestore.getInstance()
+        val busstop = db.collection("busstop")
+        /*//добавление документа в коллекцию
+        //(остановки в БД)
+        busstop.document("Student")
+            .set(mapOf(
+            "cords" to "55.881708, 37.207049",
+            "name" to "Студенческая",
+            "town" to "Zel"
+        ))*/
+        /*//получение информации из документа student
+        val stopStudent = busstop.document("Student")
+        stopStudent.get().addOnSuccessListener {
+            println("Cords of ${it.get("name")} is ${it.get("cords")}")
+        }
+        */
+        var i= 0
+        busstop.get().addOnSuccessListener {
+            it.forEach {
+               // val buff = Busstop(it.get("name").toString(), it.get("cords").toString())
+                busStops.add(Busstop(it.get("name").toString(), it.get("cords").toString()))
+               // println("In BUFF Cords of ${buff.name} is ${buff.cords}")
+                println("In list Cords of ${busStops[i].name} is ${busStops[i].cords}")
+                println("Cords of ${it.get("name")} is ${it.get("cords")}")
+                i++
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         initializeData()
+        initializeDatabase()
         linearLayoutManager = LinearLayoutManager(this)
         rv.apply {
             setHasFixedSize(true)//размер RecyclerView не будет изменяться
@@ -183,11 +217,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
     }
     //Листенер для того, на что можно кликать
     override fun onClick(clickView: View?) {
-        when (clickView) {//Если нажали на какую-то кнопку
+       /* when (clickView) {//Если нажали на какую-то кнопку
             /*buttonMain -> {//нажали на кнопку с id button
                 slideUpDownBottomSheet()
             }*/
-        }
+        }*/
     }
     private fun slideUpDownBottomSheet() {
         //Проверяем состояние BottomSheet
