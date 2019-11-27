@@ -111,8 +111,8 @@
       if(doc.exists){
         console.log(doc.data());
         names = doc.get("name");
-        alert(names)
-        i = String(names) + String(actual_post);
+        //alert(names)
+        i = actual_setter + String(actual_post);
       }      
      });
      alert(i);
@@ -124,7 +124,7 @@
            test.push(time);
            result_time = result_time + time;
            db.collection("actualtime").doc(String(i)).set({
-             name : actual_setter , 
+             name : names , 
              time : firebase.firestore.Timestamp.fromDate(new Date(Math.round(result_time / test.length))), // узнать почему сбивается юникс счисление 
              time1 : Math.round(result_time / test.length),
              rows: 3,
