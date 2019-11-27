@@ -15,14 +15,16 @@
 <h1>Привет я мозги Localtransport</h1>
 
  <h2>Введи колличество нулевых с какого элемента <input id="nullset_1" type="text" value="0"><br></h2>
- <h2>Введи колличество нулевых до какого элемента <input id="nullset_2" type="text" value="0"><br></h2>
+ <h2>Введи колличество нулевых до какого элемента <input id="nullset_2" type="text" value="15"><br></h2>
+ <h2>Введи id остановки на которую приехал транспорт <input id="nullset_3" type="text" value="Sun"><br></h2>
 <button id="start"> Cгенерировать нулевые данные </button>
 <hr> 
 <h2>Введи id остановки для рассчета актуального времени прибытия  <input id="actualset" type="text" value="Sun"><br></h2>
+<h2>Введи постфикс для файла actualtime  <input id="actual_post" type="text" value="Sun"><br></h2>
 <p><button id="calc">Рассчитать актуальное время </button></p>
 <hr> 
-<h2>Введи id остановки для удаления тестовых файлов от <input id="actual_delete_1" type="text" value="Sun"><br></h2>
-<h2>Введи id остановки для удаления тестовых файлов до <input id="actual_delete_2" type="text" value="Sun"><br></h2>
+<h2>Введи id остановки для удаления тестовых файлов от <input id="actual_delete_1" type="text" value="0"><br></h2>
+<h2>Введи id остановки для удаления тестовых файлов до <input id="actual_delete_2" type="text" value="16"><br></h2>
 <p><button id="delet">Удалить данные </button></p>
   <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
 
@@ -61,6 +63,7 @@
    null_setter_2 = document.getElementById("nullset_2").value;//получаем данные с формы 2
    null_setter_2 = Number(null_setter_2);//преобразуем в int 
    null_setter_2+=1;
+   null_setter_3 = document.getElementById("nullset_3").value;//получаем данные с формы 2
    
 
    while(k<null_setter_2 - null_setter_1){ //функция заполнения поля маршрута (дальнейшая модерация черех консоль firebase  с введение номером маршрута)
@@ -76,7 +79,7 @@
       
                 number : rows[i],
                 time : firebase.firestore.Timestamp.fromDate(new Date(time)),
-                busstop : "Sun",
+                busstop : null_setter_3,
 
             })
             .then(function() {
@@ -99,8 +102,20 @@
      var test = [];
      var result_time = 0;
      actual_setter = document.getElementById("actualset").value;//получаем данные с формы 3
-     i = actual_setter + 2;
+     actual_post = document.getElementById("actual_post").value;
      k =1;
+     var i;
+     var names;
+     var docRef = db.collection("busstop").doc(String(actual_setter));
+     docRef.get().then(function(doc){
+      if(doc.exists){
+        console.log(doc.data());
+        names = doc.get("name");
+        alert(names)
+        i = String(names) + String(actual_post);
+      }      
+     });
+     alert(i);
        db.collection("ts").where("busstop" , "==", actual_setter).get().then(function(querySnapshot){ //парсим данные через id остановки
          querySnapshot.forEach(function(doc){
            console.log(doc.id , "=> ", doc.data());
@@ -112,7 +127,9 @@
              name : actual_setter , 
              time : firebase.firestore.Timestamp.fromDate(new Date(Math.round(result_time / test.length))), // узнать почему сбивается юникс счисление 
              time1 : Math.round(result_time / test.length),
-             dec : test.length            
+             rows: 3,
+             dec : test.length 
+                        
            })          
          });
          alert("Запись создана");
