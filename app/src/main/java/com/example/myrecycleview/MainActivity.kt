@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 //Для карты
 import android.location.Location
+import android.util.Log
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -26,15 +27,10 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottom_sheet.*
 import kotlinx.android.synthetic.main.main_content.*
 import com.google.firebase.firestore.FirebaseFirestore
-import androidx.core.app.ComponentActivity
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.util.Log
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.GeoPoint
 
 
@@ -73,16 +69,25 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
             println("Cords of ${it.get("name")} is ${it.get("cords")}")
         }
         */
-        //получение всех остановок
+        //получение всех остановок whereEqualTo("town", "Zel").
         busstop.get().addOnSuccessListener {
             it.forEach {
                 val buff = Busstop(it.get("name").toString(), it.get("cords") as GeoPoint)
                 setBusstopOnMap(buff)//ставим остановку на карту
                 busStops.add(buff)//добавляем остановку в лист
-                // println("In BUFF Cords of ${buff.name} is ${buff.cords}")
-                println("In list Cords of ${busStops.last().name} is ${busStops.last().cords}")
+                Log.d("MY", "In list Cords of ${busStops.last().name} is ${busStops.last().cords}")
+                //println("In list Cords of ${busStops.last().name} is ${busStops.last().cords}")
                 println("Cords of ${it.get("name")} is ${it.get("cords")}")
             }
+        }
+        for (bs in busStops)
+        {
+            db.collection("actualtime")
+                .whereEqualTo("name", bs.name).get().addOnSuccessListener {
+                    it.forEach {
+                        bs.buses.add(Bus(it.get("rows").toString(), (it.get("time") as Timestamp).toDate()))
+                    }
+                }
         }
     }
 
@@ -105,7 +110,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        initializeData()
+        //initializeData()
+        initializeDatabase()
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -113,21 +119,33 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         //Получение запроса о последнем известном местоположении
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        //initializeDatabase()
-        linearLayoutManager = LinearLayoutManager(this)
+
+            linearLayoutManager = LinearLayoutManager(this)
         rv.apply {
             setHasFixedSize(true)//размер RecyclerView не будет изменяться
             layoutManager = linearLayoutManager
-            adapter = MyRecyclerAdapter(persons)
+            //adapter = MyRecyclerAdapter(busStops.first().buses)
         }
-
         initBottomSheet()
-
     }
     //Работа с картами
     override fun onMarkerClick(p0: Marker?) : Boolean {
         Toast.makeText(this, "yea", Toast.LENGTH_SHORT).show()
-        slideUpDownBottomSheet()
+        if (p0 != null) {
+            val buff = busStops.find { it.name.equals(p0.title) }
+            if (buff != null)
+            {
+                linearLayoutManager = LinearLayoutManager(this)
+                rv.apply {
+                    setHasFixedSize(true)//размер RecyclerView не будет изменяться
+                    layoutManager = linearLayoutManager
+                    adapter = MyRecyclerAdapter(buff.buses)
+                }
+                initBottomSheet()
+            }
+            slideUpDownBottomSheet()
+            return true
+        }
         return false
     }
     //Подключение карты
@@ -163,12 +181,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         mMap = googleMap
 
         //Добавление маркера остановки МИЭТ
+        for (busstop in busStops)
+            setBusstopOnMap(busstop)
+        /**
         val miet = LatLng(55.983174, 37.210626)
         mMap.addMarker(MarkerOptions().position(miet).title("Остановка МИЭТ"))
-        //Наведение камеры на маркер и приближение
-        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 12.0f))
         val qwe = LatLng(55.983374, 37.210926)
         mMap.addMarker(MarkerOptions().position(qwe).title("Остановка qwe"))
+        //Наведение камеры на маркер и приближение
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 12.0f))
+        */
 
         //Подключение элементов управления масштабом на карте
         mMap.uiSettings.isZoomControlsEnabled = true
@@ -193,6 +215,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         }
     }
 
+    //Работа с футором
     private fun initBottomSheet() {
         //Устанавливаем листенер (обработчик событий) на кнопку Не надо
         //buttonMain.setOnClickListener(this)

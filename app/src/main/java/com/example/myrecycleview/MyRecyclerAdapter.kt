@@ -1,38 +1,43 @@
 package com.example.myrecycleview
 
-import android.content.Intent
 import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import kotlinx.android.synthetic.main.item_bus_stop.view.*
 import kotlinx.android.synthetic.main.item_person.view.*
+import kotlinx.android.synthetic.main.item_person.view.itemImage
 
 
-class MyRecyclerAdapter(private val data: ArrayList<Person>) :
+class MyRecyclerAdapter(private val data: MutableList<Bus>) :
 RecyclerView.Adapter<MyRecyclerAdapter.PersonHolder>(){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyRecyclerAdapter.PersonHolder {
         //Here you inflate the view from its layout and pass it in to a PersonHolder
         //Заполнение элементов RecyclerView
         //В inflate передаётся вёрстка, которая будет использоваться для построения каждого элемента
-        val inflatedView = parent.inflate(R.layout.item_person,false)
+       // val inflatedView = parent.inflate(R.layout.item_person,false)
+        val inflatedView = parent.inflate(R.layout.item_bus_stop,false)
         return PersonHolder(inflatedView)
     }
 
     override fun getItemCount() = data.size//сколько будет на дисплее
 
     override fun onBindViewHolder(holder: MyRecyclerAdapter.PersonHolder, position: Int) {
-        //крч тут инициализируем наши данные
+        /**крч тут инициализируем наши данные
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        val itemPhoto = data[position]
-        holder.bindPerson(itemPhoto)
+        //val itemPhoto = data[position]
+        //holder.bindPerson(itemPhoto)*/
+
+        val item = data[position]
+        holder.bindBus(item)
     }
 
     class PersonHolder(v: View) : RecyclerView.ViewHolder(v), View.OnClickListener{
         private var view: View = v
-        private var person: Person ?= null
+        //private var person: Person ?= null
+        private var bus: Bus ?= null
 
         init {
             //инициализация листенера
@@ -48,14 +53,24 @@ RecyclerView.Adapter<MyRecyclerAdapter.PersonHolder>(){
             private val PHOTO_KEY = "PHOTO"
         }*/
 
+        fun bindBus(bus: Bus) {
+            //Показываем какие именно данные закидываем в каждый элемент
+            this.bus = bus
+            //Picasso.with(view.context).load(photo.url).into(view.itemImage)
+            //view.itemImage.setImageResource(person.photoId)
+            view.itemBusNumber.text = bus.busNumber
+            view.itemTime.text = bus.arrivalTime.toString()
+        }
+
+        /**
         fun bindPerson(person: Person) {
             //Показываем какие именно данные закидываем в каждый элемент
-            this.person = person
+            //this.person = person
             //Picasso.with(view.context).load(photo.url).into(view.itemImage)
             view.itemImage.setImageResource(person.photoId)
             view.itemDate.text = person.name
             view.itemDescription.text = person.age
-        }
+        }*/
     }
 
 }
