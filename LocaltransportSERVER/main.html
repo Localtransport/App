@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Local transport MIND</title>
+  <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+  <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+  <link href="style.css" rel="stylesheet">
+ </head>
+
+ <body>
+    
+    
+
+<h1>Привет я мозги Localtransport</h1>
+
+ <h2>Введи колличество нулевых с какого элемента <input id="nullset_1" type="text" value="0"><br></h2>
+ <h2>Введи колличество нулевых до какого элемента <input id="nullset_2" type="text" value="0"><br></h2>
+<button id="start"> Cгенерировать нулевые данные </button>
+<hr> 
+<h2>Введи id остановки для рассчета актуального времени прибытия  <input id="actualset" type="text" value="Sun"><br></h2>
+<p><button id="calc">Рассчитать актуальное время </button></p>
+<hr> 
+<h2>Введи id остановки для удаления тестовых файлов от <input id="actual_delete_1" type="text" value="Sun"><br></h2>
+<h2>Введи id остановки для удаления тестовых файлов до <input id="actual_delete_2" type="text" value="Sun"><br></h2>
+<p><button id="delet">Удалить данные </button></p>
+  <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
+
+  <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-app.js"></script>
+
+  <!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
+  <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-analytics.js"></script>
+  <!-- Add Firebase products that you want to use -->
+  <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-firestore.js"></script>
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyBI9v_lHYnXR3yfrBu6DpkH4b4DeuH0_og",
+    authDomain: "local-transport-f60ff.firebaseapp.com",
+    databaseURL: "https://local-transport-f60ff.firebaseio.com",
+    projectId: "local-transport-f60ff",
+    storageBucket: "local-transport-f60ff.appspot.com",
+    messagingSenderId: "181631230967",
+    appId: "1:181631230967:web:1ff004f1f4416b881ec4f2"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  var i = 0 ;
+  var db = firebase.firestore();
+  
+  
+  start.onclick = function(){    //функция заносит дефолтные данные (первичное определение данных)
+   var i= 0;
+   var k = 0 ;
+   let rows = [];
+   null_setter_1 = document.getElementById("nullset_1").value;//получаем данные с формы 1
+   null_setter_1 = Number(null_setter_1);//преобразуем в int 
+   null_setter_2 = document.getElementById("nullset_2").value;//получаем данные с формы 2
+   null_setter_2 = Number(null_setter_2);//преобразуем в int 
+   null_setter_2+=1;
+   
+
+   while(k<null_setter_2 - null_setter_1){ //функция заполнения поля маршрута (дальнейшая модерация черех консоль firebase  с введение номером маршрута)
+     var z = Math.random()%10;
+     rows.push(z);
+     k=k+1;
+   }
+
+
+   while(null_setter_1<null_setter_2){ //создание документов
+    var time = Date.now();
+    db.collection("ts").doc(String(null_setter_1)).set({
+      
+                number : rows[i],
+                time : firebase.firestore.Timestamp.fromDate(new Date(time)),
+                busstop : "Sun",
+
+            })
+            .then(function() {
+                console.log("Document successfully written!");
+            })
+            .catch(function(error) {
+                console.error("Error writing document: ", error);
+            });
+            i++;
+            null_setter_1++;
+
+   }
+      alert("Документы генерируются")
+  }
+ 
+ 
+ 
+ 
+  calc.onclick = function(){ //функция вычисления актуального 
+     var test = [];
+     var result_time = 0;
+     actual_setter = document.getElementById("actualset").value;//получаем данные с формы 3
+     i = actual_setter + 2;
+     k =1;
+       db.collection("ts").where("busstop" , "==", actual_setter).get().then(function(querySnapshot){ //парсим данные через id остановки
+         querySnapshot.forEach(function(doc){
+           console.log(doc.id , "=> ", doc.data());
+           var time1 = doc.get("time");
+           var time = time1.seconds;
+           test.push(time);
+           result_time = result_time + time;
+           db.collection("actualtime").doc(String(i)).set({
+             name : actual_setter , 
+             time : firebase.firestore.Timestamp.fromDate(new Date(Math.round(result_time / test.length))), // узнать почему сбивается юникс счисление 
+             time1 : Math.round(result_time / test.length),
+             dec : test.length            
+           })          
+         });
+         alert("Запись создана");
+       });  
+    alert("данные загружаются");
+  }
+  
+  
+  
+  delet.onclick = function(){ //удаление тестовых данных
+    actual_delet_1 = document.getElementById("actual_delete_1").value;//получаем данные с формы 4
+    actual_delet_2 = document.getElementById("actual_delete_2").value;//получаем данные с формы 5
+    actual_delet_3 = Number(actual_delet_1)
+    actual_delet_4 = Number(actual_delet_2)
+    while(actual_delet_3 < actual_delet_4){
+    db.collection("ts").doc(String(actual_delet_3)).delete().then(function(){ 
+      console.log("Document successfully deleted!");
+      }).catch(function(error) {
+      console.error("Error removing document: ", error);
+    });
+    actual_delet_3++;
+    }
+  }
+
+
+
+</script>
+
+
+
+</body>
+</html
