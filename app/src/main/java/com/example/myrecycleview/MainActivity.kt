@@ -140,6 +140,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
                     setHasFixedSize(true)//размер RecyclerView не будет изменяться
                     layoutManager = linearLayoutManager
                     adapter = MyRecyclerAdapter(buff.buses)
+                    name_busstop.text = buff.name
                 }
                 initBottomSheet()
             }
