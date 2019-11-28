@@ -12,153 +12,182 @@
     
     
 
-<h1>Привет я мозги Localtransport</h1>
-
- <h2>Введи колличество нулевых с какого элемента <input id="nullset_1" type="text" value="0"><br></h2>
- <h2>Введи колличество нулевых до какого элемента <input id="nullset_2" type="text" value="15"><br></h2>
- <h2>Введи id остановки на которую приехал транспорт <input id="nullset_3" type="text" value="Sun"><br></h2>
-<button id="start"> Cгенерировать нулевые данные </button>
+<h1 class="h1">Привет я мозги Localtransport</h1>
+<br>
+<hr>
+<h2 class="h2">Введи колличество нулевых с какого элемента <input class="inputt"id="nullset_1" type="text" value="0"><br></h2>
+<h2 class="h2">Введи колличество нулевых до какого элемента <input class="inputt" id="nullset_2" type="text" value="15"><br></h2>
+<h2 class="h2">Введи id остановки на которую приехал транспорт <input class="inputt" id="nullset_3" type="text" value="Sun"><br></h2>
+<button id="start" class="button"> Cгенерировать нулевые данные </button>
 <hr> 
-<h2>Введи id остановки для рассчета актуального времени прибытия  <input id="actualset" type="text" value="Sun"><br></h2>
-<h2>Введи постфикс для файла actualtime  <input id="actual_post" type="text" value="Sun"><br></h2>
-<p><button id="calc">Рассчитать актуальное время </button></p>
+<h2 class="h2">Введи id остановки для рассчета актуального времени прибытия  <input class="inputt" id="actualset" type="text" value="Sun"><br></h2>
+<h2 class="h2">Введи постфикс для файла actualtime  <input class="inputt" id="actual_post" type="text" value="4"><br></h2>
+<p><button id="calc" class="button">Рассчитать актуальное время </button></p>
 <hr> 
-<h2>Введи id остановки для удаления тестовых файлов от <input id="actual_delete_1" type="text" value="0"><br></h2>
-<h2>Введи id остановки для удаления тестовых файлов до <input id="actual_delete_2" type="text" value="16"><br></h2>
-<p><button id="delet">Удалить данные </button></p>
-  <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
+<h2 class="h2">Введи id  для удаления тестовых (стартовое положение)  <input class="inputt" id="actual_delete_1" type="text" value="0"><br></h2>
+<h2 class="h2">Введи id для удаления тестовых файлов (конечное) <input class="inputt" id="actual_delete_2" type="text" value="16"><br></h2>
+<p><button id="delet" class="button">Удалить данные </button></p>
+<hr> 
+<h2 class="h2">Получение данных о остановках города : <input class="inputt" id="id_town" type="text" value="Zel"><br></h2>
+<button id="get_town" class="button">Выгрузить данные </button>
+<br>
+<div id="br_get_town" class="datastorm"> </div>
+<hr> 
 
-  <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
-  <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-app.js"></script>
-
-  <!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
-  <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-analytics.js"></script>
-  <!-- Add Firebase products that you want to use -->
-  <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-firestore.js"></script>
+<!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
+<!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-app.js"></script>
+<!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
+<script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-analytics.js"></script>
+<!-- Add Firebase products that you want to use -->
+<script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-firestore.js"></script>
 
 <script>
-  // Your web app's Firebase configuration
-  var firebaseConfig = {
-    apiKey: "AIzaSyBI9v_lHYnXR3yfrBu6DpkH4b4DeuH0_og",
-    authDomain: "local-transport-f60ff.firebaseapp.com",
-    databaseURL: "https://local-transport-f60ff.firebaseio.com",
-    projectId: "local-transport-f60ff",
-    storageBucket: "local-transport-f60ff.appspot.com",
-    messagingSenderId: "181631230967",
-    appId: "1:181631230967:web:1ff004f1f4416b881ec4f2"
-  };
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  var i = 0 ;
-  var db = firebase.firestore();
-  
-  
-  start.onclick = function(){    //функция заносит дефолтные данные (первичное определение данных)
-   var i= 0;
-   var k = 0 ;
-   let rows = [];
-   null_setter_1 = document.getElementById("nullset_1").value;//получаем данные с формы 1
-   null_setter_1 = Number(null_setter_1);//преобразуем в int 
-   null_setter_2 = document.getElementById("nullset_2").value;//получаем данные с формы 2
-   null_setter_2 = Number(null_setter_2);//преобразуем в int 
-   null_setter_2+=1;
-   null_setter_3 = document.getElementById("nullset_3").value;//получаем данные с формы 2
-   
+// Your web app's Firebase configuration
+var firebaseConfig = {
+  apiKey: "AIzaSyBI9v_lHYnXR3yfrBu6DpkH4b4DeuH0_og",
+  authDomain: "local-transport-f60ff.firebaseapp.com",
+  databaseURL: "https://local-transport-f60ff.firebaseio.com",
+  projectId: "local-transport-f60ff",
+  storageBucket: "local-transport-f60ff.appspot.com",
+  messagingSenderId: "181631230967",
+  appId: "1:181631230967:web:1ff004f1f4416b881ec4f2"
+};
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+var i = 0 ;
+var db = firebase.firestore();
 
-   while(k<null_setter_2 - null_setter_1){ //функция заполнения поля маршрута (дальнейшая модерация черех консоль firebase  с введение номером маршрута)
-     var z = Math.random()%10;
-     rows.push(z);
-     k=k+1;
-   }
+start.onclick = function(){    //функция заносит дефолтные данные (первичное определение данных)
+  var i= 0;
+  var k =0 ;
+  var rows = [];
+  var time = Date.now();
+  null_setter_1 = document.getElementById("nullset_1").value;//определяем с какого id  начнем создавать
+  null_setter_1 = Number(null_setter_1);//преобразуем в int 
+  null_setter_2 = document.getElementById("nullset_2").value;//определяем на каком id закончим создавать
+  null_setter_2 = Number(null_setter_2);//преобразуем в int 
+  null_setter_3 = document.getElementById("nullset_3").value;//Устанавливаем для какой остановки генерируем значения
+  var rows_set = db.collection("busstop").doc(String(null_setter_3)); // конектимся к БД
+  rows_set.get().then(function(doc){ //Получаем документ
+  if(doc.exists){
+    console.log(doc.data());
+    rows = doc.get("rows"); //получаем массив возможных маршрутов
+    i = rows.length; //узнаем длинну полученого массива 
+    k = -0.5+(Math.random()  * (i+1)) ; // рандом
+    k=Math.round(k); //приведение к целому число
+    alert("Данные создаются")
+    while(null_setter_1<=null_setter_2){ //создание документов
+      db.collection("ts").doc(String(null_setter_1)).set({  
+        number : rows[k],
+        time : firebase.firestore.Timestamp.fromDate(new Date(time)),
+        busstop : null_setter_3,
+      })
+    .then(function() {
+      console.log("Document successfully written!");
+    })
+    .catch(function(error) {
+      console.error("Error writing document: ", error);
+    });
+    null_setter_1++;
+    }
+    }else{
+        console.log("No such document!");
+    }
+  }).catch(function(error){
+    console.log("Error getting document:", error);
+  });
+}
 
 
-   while(null_setter_1<null_setter_2){ //создание документов
-    var time = Date.now();
-    db.collection("ts").doc(String(null_setter_1)).set({
-      
-                number : rows[i],
-                time : firebase.firestore.Timestamp.fromDate(new Date(time)),
-                busstop : null_setter_3,
-
-            })
-            .then(function() {
-                console.log("Document successfully written!");
-            })
-            .catch(function(error) {
-                console.error("Error writing document: ", error);
-            });
-            i++;
-            null_setter_1++;
-
-   }
-      alert("Документы генерируются")
-  }
- 
- 
- 
- 
-  calc.onclick = function(){ //функция вычисления актуального 
-     var test = [];
-     var result_time = 0;
-     actual_setter = document.getElementById("actualset").value;//получаем данные с формы 3
-     actual_post = document.getElementById("actual_post").value;
-     k =1;
-     var i;
-     var names;
-     var docRef = db.collection("busstop").doc(String(actual_setter));
-     docRef.get().then(function(doc){
-      if(doc.exists){
-        console.log(doc.data());
-        names = doc.get("name");
-        //alert(names)
-        i = actual_setter + String(actual_post);
-      }      
-     });
-     alert(i);
-       db.collection("ts").where("busstop" , "==", actual_setter).get().then(function(querySnapshot){ //парсим данные через id остановки
-         querySnapshot.forEach(function(doc){
-           console.log(doc.id , "=> ", doc.data());
-           var time1 = doc.get("time");
-           var time = time1.seconds;
-           test.push(time);
-           result_time = result_time + time;
-           db.collection("actualtime").doc(String(i)).set({
-             name : names , 
-             time : firebase.firestore.Timestamp.fromDate(new Date(Math.round(result_time / test.length))), // узнать почему сбивается юникс счисление 
+calc.onclick = function(){ //функция вычисления актуальных значений из ts
+  var test = [];
+  var result_time = 0;
+  var k =1;
+  var i;
+  var names;
+  actual_setter = document.getElementById("actualset").value;//Какую остановку вылавливаем из ts
+  actual_post = document.getElementById("actual_post").value;//Какой postfix установить после генерации
+  var docRef = db.collection("busstop").doc(String(actual_setter));
+  docRef.get().then(function(doc){ // получаем doc из busstop
+    if(doc.exists){
+      console.log(doc.data());
+      names = doc.get("name"); // получаем name из doc
+      i = actual_setter + String(actual_post);
+    }      
+  });
+  db.collection("ts").where("busstop" , "==", actual_setter).get().then(function(querySnapshot){ //парсим данные из ts через id остановки
+    querySnapshot.forEach(function(doc){
+       console.log(doc.id , "=> ", doc.data());
+       var time1 = doc.get("time");
+       var time = time1.seconds;
+       test.push(time);
+       result_time = result_time + time; // вычисляем время для актуальной коллекции
+       db.collection("actualtime").doc(String(i)).set({  //генерируем документ в коллекции actualtime
+             name : names ,  
+             time : firebase.firestore.Timestamp.fromDate(new Date(Math.round(result_time / test.length)*1000)), 
              time1 : Math.round(result_time / test.length),
              rows: 3,
              dec : test.length 
                         
-           })          
-         });
-         alert("Запись создана");
-       });  
-    alert("данные загружаются");
-  }
+        })          
+    });
+  alert("Данные загружены");
+  alert("Запись создана");
+ /* var k=1;
+  while(k<test.length){
+    if(test[k]-test[k+1]<100 && test[k]-test[k-1]<100){
+      test
+
+    }
+
+
+   k++;  
+  }*/
+
+  });    
+}
   
-  
-  
-  delet.onclick = function(){ //удаление тестовых данных
-    actual_delet_1 = document.getElementById("actual_delete_1").value;//получаем данные с формы 4
-    actual_delet_2 = document.getElementById("actual_delete_2").value;//получаем данные с формы 5
-    actual_delet_3 = Number(actual_delet_1)
-    actual_delet_4 = Number(actual_delet_2)
-    while(actual_delet_3 < actual_delet_4){
+
+
+
+delet.onclick = function(){ //удаление документов из коллекции ts
+  actual_delet_1 = document.getElementById("actual_delete_1").value;//id элемента с которого начинаем удалять
+  actual_delet_2 = document.getElementById("actual_delete_2").value;//id элемента до которого удаляем
+  actual_delet_3 = Number(actual_delet_1)
+  actual_delet_4 = Number(actual_delet_2)
+  while(actual_delet_3 < actual_delet_4){
     db.collection("ts").doc(String(actual_delet_3)).delete().then(function(){ 
       console.log("Document successfully deleted!");
-      }).catch(function(error) {
+    }).catch(function(error){
       console.error("Error removing document: ", error);
     });
-    actual_delet_3++;
-    }
+  actual_delet_3++;
   }
+alert("Данные удалены")
+}
+
+get_town.onclick = function(){ //вывод информации о остановках города
+  i=0;
+  id_town = document.getElementById("id_town").value; // считываем по какому городу ищем
+  document.getElementById('br_get_town').innerHTML = ''; // очищаем obj
+  db.collection("busstop").where("town" , "==", id_town).get().then(function(querySnapshot){ // запрашиваем данные из busstop
+    querySnapshot.forEach(function(doc){
+      console.log(doc.id , "=> ", doc.data());
+      i++;
+      var cords = doc.get("cords");
+      var res_cords = String(cords.latitude)+"  "+ String(cords.longitude); //приводим res_cord к стринговому значению         
+      br_get_town.append("  ",String(doc.get("name"))," => ",res_cords,document.createElement('br')); //генерация html для вывода данных и ьзанесение туда этих данных
+    });
+  br_get_town.prepend("Информация о всех остановках города c id :",id_town,document.createElement('br')); // заголовок
+  message = "Колличество остановок в городе"+id_town+": "+i;
+  alert(message);    
+  });
+}
 
 
 
 </script>
-
-
-
 </body>
-</html
+</html>
