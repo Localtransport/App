@@ -25,14 +25,17 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.Tasks
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.bottom_sheet.*
 import kotlinx.android.synthetic.main.main_content.*
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.EventListener
-import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 
 
 class MainActivity : AppCompatActivity(), View.OnClickListener,
@@ -49,11 +52,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
     }
     //Для данных
     private lateinit var linearLayoutManager: LinearLayoutManager
+    private lateinit var db : FirebaseFirestore
     private val busStops = mutableListOf<Busstop>()
+   // private lateinit var bufstop: Busstop
 
     private fun readBusstops(myCallback: (MutableList<Busstop>) -> Unit)
     {
-        val db = FirebaseFirestore.getInstance()
+        db = FirebaseFirestore.getInstance()
         val busstop = db.collection("busstop")
         /*получение информации из документа student
         val stopStudent = busstop.document("Student")
@@ -76,20 +81,18 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         }
     }
 
-    private fun readBusses(myCallback: (MutableList<Busstop>) -> Unit)
+    private fun readBus(bufstop: Busstop)
     {
-        val db = FirebaseFirestore.getInstance()
-        for (bs in busStops)
-         {
-             db.collection("actualtime")
-                 .whereEqualTo("name", bs.name).get().addOnSuccessListener {
-                     it.forEach {
-                         var kek = it.get("rows").toString()
-                         bs.buses.add(Bus(it.get("rows").toString(), (it.get("time") as Timestamp).toDate()))
-                     }
-                 }
-         }
-        myCallback(busStops)//сообщаем о том, что мы считали данные
+        db.collection("actualtime").whereEqualTo("name", bufstop.name).get().addOnSuccessListener {
+            it.forEach { it1 ->
+                bufstop.buses.add(
+                    Bus(it1.get("rows").toString(), (it1.getTimestamp("time") as Timestamp).toDate()
+                    )
+                )
+                Log.d("KKK", bufstop.name)
+                Log.d("KKK", bufstop.buses.size.toString())
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,12 +101,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
 
         //initializeData()
         readBusstops(){
-                Log.d("III", busStops.size.toString())
-            readBusses(){
-                //Log.d("III", busStops.first().name)
-                //Log.d("III", busStops.first().buses.size.toString())
-                mMap.setOnMarkerClickListener(this)
+            Log.d("III", busStops.size.toString())
+            for (bs in busStops) {
+                Log.d("III", bs.name)
+                Log.d("III", bs.buses.size.toString())
+                readBus(bs)
             }
+            mMap.setOnMarkerClickListener(this)
         }
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager

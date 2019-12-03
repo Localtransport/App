@@ -43,4 +43,6 @@ dependencies {
     //firebase
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.google.firebase:firebase-firestore:21.3.0'
+    //чтобы пофиксить асинхронную загрузку данных
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.2.1"
 }
