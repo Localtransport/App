@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         db.collection("actualtime").whereEqualTo("name", bufstop.name).get().addOnSuccessListener {
             it.forEach { it1 ->
                 bufstop.buses.add(
-                    Bus(it1.get("rows").toString(), it1.getTimestamp("time") as Timestamp)
+                    Bus(it1.get("rows").toString(), (it1.getTimestamp("time") as Timestamp).toDate())
                 )
                 Log.d("KKK", bufstop.name)
                 Log.d("KKK", bufstop.buses.size.toString())

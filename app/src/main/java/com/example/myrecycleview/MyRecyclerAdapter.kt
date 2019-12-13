@@ -9,6 +9,7 @@ import kotlinx.android.synthetic.main.item_bus_stop.view.*
 import kotlinx.android.synthetic.main.item_person.view.*
 import kotlinx.android.synthetic.main.item_person.view.itemImage
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 
 class MyRecyclerAdapter(private val data: MutableList<Bus>) :
@@ -60,9 +61,9 @@ RecyclerView.Adapter<MyRecyclerAdapter.PersonHolder>(){
             this.bus = bus
             view.itemBusNumber.text = bus.busNumber
 
-            var timeNow = Timestamp.now().toDate()
-            val sec = bus.arrivalTime.toDate().hours - timeNow.hours
-            val nano = bus.arrivalTime.toDate().minutes - timeNow.minutes
+            var timeNow = Date()
+            val sec = bus.arrivalTime.hours - timeNow.hours
+            val nano = bus.arrivalTime.minutes - timeNow.minutes
             if (nano > 0  && sec > 0) {
                 view.itemTime.text = nano.toString()
             }
