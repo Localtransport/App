@@ -32,10 +32,12 @@ import kotlinx.android.synthetic.main.bottom_sheet.*
 import kotlinx.android.synthetic.main.main_content.*
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.*
+import kotlinx.android.synthetic.main.item_bus_stop.view.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
+import java.util.*
 
 
 class MainActivity : AppCompatActivity(), View.OnClickListener,
@@ -114,7 +116,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         initBottomSheet()
 
     }
+
+
     //Работа с картами
+    //Функция загрузки нужных данных в recyclerView
+    //вызывается при нажатии на остановку
     override fun onMarkerClick(p0: Marker?) : Boolean {
         if (p0 != null) {
             val buff = busStops.find { it.name.equals(p0.title) }
@@ -122,11 +128,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
             {
                 linearLayoutManager = LinearLayoutManager(this)
                 rv.apply {
+                    name_busstop.text = buff.name
                     setHasFixedSize(true)//размер RecyclerView не будет изменяться
                     layoutManager = linearLayoutManager
-                    adapter = MyRecyclerAdapter(buff.buses)
-
-                    name_busstop.text = buff.name
+                    adapter = MyRecyclerAdapter(actualBuses(buff.buses))
                 }
                 initBottomSheet()
             }
@@ -134,6 +139,30 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
             return true
         }
         return false
+    }
+    //Находит актуальные автобусы для текущего запроса, чтобы отсправить их в RV
+    private fun actualBuses(busInStop: MutableList<Bus> ) : MutableList<Bus> {
+        val bu = mutableListOf<Bus>()
+        var timeNow = Date()
+        var buf = Date()
+        var timeArrival : Int
+        var timeNoww : Int
+        var bufTime : Int
+
+        for (bus in busInStop) {
+                timeArrival = bus.arrivalTime.hours * 60 + bus.arrivalTime.minutes
+                timeNoww = timeNow.hours * 60 + timeNow.minutes
+                bufTime = timeArrival - timeNoww
+                if (bufTime > 0)
+                {
+                    buf.hours = bufTime / 60
+                    buf.minutes = bufTime % 60
+                    bu.add(Bus(bus.busNumber, buf))
+                }
+        }
+        if (bu.isNotEmpty())
+            return bu
+        return busInStop
     }
     //Подключение карты
     private fun setUpMap() {

@@ -60,16 +60,8 @@ RecyclerView.Adapter<MyRecyclerAdapter.PersonHolder>(){
             //Показываем какие именно данные закидываем в каждый элемент
             this.bus = bus
             view.itemBusNumber.text = bus.busNumber
+            view.itemTime.text = bus.arrivalTime.minutes.toString()
 
-            var timeNow = Date()
-            val sec = bus.arrivalTime.hours - timeNow.hours
-            val nano = bus.arrivalTime.minutes - timeNow.minutes
-            if (nano > 0  && sec > 0) {
-                view.itemTime.text = nano.toString()
-            }
-            else {
-                view.itemTime.text = timeNow.toString()
-            }
         }
         /**
         fun bindPerson(person: Person) {
