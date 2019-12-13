@@ -7,3 +7,9 @@ class Bus (
     val busNumber: String,
     val arrivalTime: Date
 )
+
+class BusForAdapter (
+    // val photoId :Int,
+    val busNumber: String,
+    var arrivalTime:  String
+)

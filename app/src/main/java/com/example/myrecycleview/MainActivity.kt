@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
     //вызывается при нажатии на остановку
     override fun onMarkerClick(p0: Marker?) : Boolean {
         if (p0 != null) {
-            val buff = busStops.find { it.name.equals(p0.title) }
+            val buff = busStops.find { it.name == p0.title }
             if (buff != null)
             {
                 linearLayoutManager = LinearLayoutManager(this)
@@ -132,6 +132,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
                     setHasFixedSize(true)//размер RecyclerView не будет изменяться
                     layoutManager = linearLayoutManager
                     adapter = MyRecyclerAdapter(actualBuses(buff.buses))
+                    //("сортировка списка автобусов по времени прибытия")
                 }
                 initBottomSheet()
             }
@@ -141,28 +142,48 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         return false
     }
     //Находит актуальные автобусы для текущего запроса, чтобы отсправить их в RV
-    private fun actualBuses(busInStop: MutableList<Bus> ) : MutableList<Bus> {
-        val bu = mutableListOf<Bus>()
+    private fun actualBuses(busInStop: MutableList<Bus> ) : MutableList<BusForAdapter> {
+        val bu = mutableListOf<BusForAdapter>()
         var timeNow = Date()
         var buf = Date()
         var timeArrival : Int
         var timeNoww : Int
         var bufTime : Int
-
+        var b: BusForAdapter?
         for (bus in busInStop) {
                 timeArrival = bus.arrivalTime.hours * 60 + bus.arrivalTime.minutes
                 timeNoww = timeNow.hours * 60 + timeNow.minutes
                 bufTime = timeArrival - timeNoww
-                if (bufTime > 0)
-                {
+                if (bufTime > 0) {
                     buf.hours = bufTime / 60
                     buf.minutes = bufTime % 60
-                    bu.add(Bus(bus.busNumber, buf))
+                    b = bu.find { it.busNumber == bus.busNumber }
+                    if (buf.minutes <= 15) {
+                        if (b == null)
+                            bu.add(BusForAdapter(bus.busNumber, buf.minutes.toString().plus(" мин")))
+                        else if ( b != null)
+                            b.arrivalTime =
+                                b.arrivalTime + "\n" + buf.minutes.toString().plus(" мин")
+                    }
+                    else if (bufTime < 120)//<
+                    {
+                        if (b != null)
+                            b.arrivalTime =
+                                b.arrivalTime + "\n" + buf.hours.toString() + ":" + buf.minutes.toString()
+                        else
+                            bu.add(
+                                BusForAdapter(
+                                    bus.busNumber,
+                                    buf.hours.toString() + ":" + buf.minutes.toString()
+                                )
+                            )
+
+                    }
                 }
         }
-        if (bu.isNotEmpty())
+       // if (bu.isNotEmpty())
             return bu
-        return busInStop
+        //return null
     }
     //Подключение карты
     private fun setUpMap() {

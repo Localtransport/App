@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 
-class MyRecyclerAdapter(private val data: MutableList<Bus>) :
+class MyRecyclerAdapter(private val data: MutableList<BusForAdapter>) :
 RecyclerView.Adapter<MyRecyclerAdapter.PersonHolder>(){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyRecyclerAdapter.PersonHolder {
@@ -39,8 +39,7 @@ RecyclerView.Adapter<MyRecyclerAdapter.PersonHolder>(){
 
     class PersonHolder(v: View) : RecyclerView.ViewHolder(v), View.OnClickListener{
         private var view: View = v
-        //private var person: Person ?= null
-        private var bus: Bus ?= null
+        private var bus: BusForAdapter ?= null
 
         init {
             //инициализация листенера
@@ -56,11 +55,11 @@ RecyclerView.Adapter<MyRecyclerAdapter.PersonHolder>(){
             private val PHOTO_KEY = "PHOTO"
         }*/
 
-        fun bindBus(bus: Bus) {
+        fun bindBus(bus: BusForAdapter) {
             //Показываем какие именно данные закидываем в каждый элемент
             this.bus = bus
             view.itemBusNumber.text = bus.busNumber
-            view.itemTime.text = bus.arrivalTime.minutes.toString()
+            view.itemTime.text = bus.arrivalTime
 
         }
         /**
