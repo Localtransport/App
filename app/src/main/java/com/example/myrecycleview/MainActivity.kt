@@ -131,8 +131,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
                     name_busstop.text = buff.name
                     setHasFixedSize(true)//размер RecyclerView не будет изменяться
                     layoutManager = linearLayoutManager
-                    adapter = MyRecyclerAdapter(actualBuses(buff.buses))
-                    //("сортировка списка автобусов по времени прибытия")
+                    val b = actualBuses(buff.buses)//("сортировка списка автобусов по времени прибытия")
+                    if (b != null)
+                        adapter = MyRecyclerAdapter(b)
+                    else
+                        adapter = DefaultAdapter("Пока что автобусов нет :с")
                 }
                 initBottomSheet()
             }
@@ -142,7 +145,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         return false
     }
     //Находит актуальные автобусы для текущего запроса, чтобы отсправить их в RV
-    private fun actualBuses(busInStop: MutableList<Bus> ) : MutableList<BusForAdapter> {
+    private fun actualBuses(busInStop: MutableList<Bus> ) : MutableList<BusForAdapter>? {
         val bu = mutableListOf<BusForAdapter>()
         var timeNow = Date()
         var buf = Date()
@@ -151,39 +154,49 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         var bufTime : Int
         var b: BusForAdapter?
         for (bus in busInStop) {
-                timeArrival = bus.arrivalTime.hours * 60 + bus.arrivalTime.minutes
+                timeArrival = bus.arrivalTime.hours * 60 + bus.arrivalTime.hours
                 timeNoww = timeNow.hours * 60 + timeNow.minutes
                 bufTime = timeArrival - timeNoww
                 if (bufTime > 0) {
-                    buf.hours = bufTime / 60
                     buf.minutes = bufTime % 60
                     b = bu.find { it.busNumber == bus.busNumber }
-                    if (buf.minutes <= 15) {
+                    if (bufTime <= 15) {
                         if (b == null)
                             bu.add(BusForAdapter(bus.busNumber, buf.minutes.toString().plus(" мин")))
                         else if ( b != null)
                             b.arrivalTime =
-                                b.arrivalTime + "\n" + buf.minutes.toString().plus(" мин")
+                                b.arrivalTime + "\n" +  buf.minutes.toString() + " мин"
                     }
-                    else if (bufTime < 120)//<
+                    else if (bufTime < 120)
                     {
-                        if (b != null)
-                            b.arrivalTime =
-                                b.arrivalTime + "\n" + buf.hours.toString() + ":" + buf.minutes.toString()
-                        else
-                            bu.add(
-                                BusForAdapter(
-                                    bus.busNumber,
-                                    buf.hours.toString() + ":" + buf.minutes.toString()
-                                )
-                            )
-
+                        if (b != null) {
+                            if (bus.arrivalTime.minutes < 10)
+                                b.arrivalTime =
+                                    b.arrivalTime + "\n" + bus.arrivalTime.hours.toString() + ":0" + bus.arrivalTime.minutes.toString()
+                            else
+                                b.arrivalTime =
+                                    b.arrivalTime + "\n" + bus.arrivalTime.hours.toString() + ":" + bus.arrivalTime.minutes.toString()
+                        }
+                        else {
+                            if (bus.arrivalTime.minutes < 10)
+                                bu.add(
+                                    BusForAdapter(
+                                        bus.busNumber,
+                                        bus.arrivalTime.hours.toString() + ":0" + bus.arrivalTime.minutes.toString()
+                                    ))
+                            else
+                                bu.add(
+                                    BusForAdapter(
+                                        bus.busNumber,
+                                        bus.arrivalTime.hours.toString() + ":" + bus.arrivalTime.minutes.toString()
+                                    ))
+                        }
                     }
                 }
         }
-       // if (bu.isNotEmpty())
+        if (bu.isNotEmpty())
             return bu
-        //return null
+        return null
     }
     //Подключение карты
     private fun setUpMap() {
@@ -322,11 +335,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId){
             R.id.action_kovrov ->{
-                Toast.makeText(this, "Open Kovrov", Toast.LENGTH_SHORT).show()
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(56.363715, 41.312183), 12f))
+                //Toast.makeText(this, "Open Kovrov", Toast.LENGTH_SHORT).show()
                 return true
             }
             R.id.action_ulsk ->{
-                Toast.makeText(this, "Open Ulyanovsk", Toast.LENGTH_SHORT).show()
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(55.983284, 37.209307), 12f))
+                //Toast.makeText(this, "Open Ulyanovsk", Toast.LENGTH_SHORT).show()
                 return true
             }
             null -> return false

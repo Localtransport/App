@@ -4,13 +4,7 @@ import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import com.google.firebase.Timestamp
 import kotlinx.android.synthetic.main.item_bus_stop.view.*
-import kotlinx.android.synthetic.main.item_person.view.*
-import kotlinx.android.synthetic.main.item_person.view.itemImage
-import java.time.format.DateTimeFormatter
-import java.util.*
-
 
 class MyRecyclerAdapter(private val data: MutableList<BusForAdapter>) :
 RecyclerView.Adapter<MyRecyclerAdapter.PersonHolder>(){
