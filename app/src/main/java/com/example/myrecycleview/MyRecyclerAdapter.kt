@@ -4,9 +4,11 @@ import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import com.google.firebase.Timestamp
 import kotlinx.android.synthetic.main.item_bus_stop.view.*
 import kotlinx.android.synthetic.main.item_person.view.*
 import kotlinx.android.synthetic.main.item_person.view.itemImage
+import java.time.format.DateTimeFormatter
 
 
 class MyRecyclerAdapter(private val data: MutableList<Bus>) :
@@ -56,12 +58,18 @@ RecyclerView.Adapter<MyRecyclerAdapter.PersonHolder>(){
         fun bindBus(bus: Bus) {
             //Показываем какие именно данные закидываем в каждый элемент
             this.bus = bus
-            //Picasso.with(view.context).load(photo.url).into(view.itemImage)
-            //view.itemImage.setImageResource(person.photoId)
             view.itemBusNumber.text = bus.busNumber
-            view.itemTime.text = bus.arrivalTime.toString()
-        }
 
+            var timeNow = Timestamp.now().toDate()
+            val sec = bus.arrivalTime.toDate().hours - timeNow.hours
+            val nano = bus.arrivalTime.toDate().minutes - timeNow.minutes
+            if (nano > 0  && sec > 0) {
+                view.itemTime.text = nano.toString()
+            }
+            else {
+                view.itemTime.text = timeNow.toString()
+            }
+        }
         /**
         fun bindPerson(person: Person) {
             //Показываем какие именно данные закидываем в каждый элемент

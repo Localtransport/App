@@ -54,22 +54,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var db : FirebaseFirestore
     private val busStops = mutableListOf<Busstop>()
-   // private lateinit var bufstop: Busstop
 
+    //Считывание данных из БД
     private fun readBusstops(myCallback: (MutableList<Busstop>) -> Unit)
     {
         db = FirebaseFirestore.getInstance()
         val busstop = db.collection("busstop")
-        /*получение информации из документа student
-        val stopStudent = busstop.document("Student")
-        stopStudent.get().addOnSuccessListener {
-            println("Cords of ${it.get("name")} is ${it.get("cords")}")
-        }
-        //получение всех остановок whereEqualTo("town", "Zel").
-        */
         var buff : Busstop
-
-        busstop.whereEqualTo("town", "Zel").get().addOnSuccessListener {
+//.whereEqualTo("town", "Zel")
+        busstop.get().addOnSuccessListener {
             it.forEach { it1 ->
                 buff = Busstop(it1.get("name").toString(), it1.get("cords") as GeoPoint, mutableListOf<Bus>())
                 setBusstopOnMap(buff)//ставим остановку на карту
@@ -80,14 +73,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
             myCallback(busStops)//сообщаем о том, что мы считали данные
         }
     }
-
     private fun readBus(bufstop: Busstop)
     {
         db.collection("actualtime").whereEqualTo("name", bufstop.name).get().addOnSuccessListener {
             it.forEach { it1 ->
                 bufstop.buses.add(
-                    Bus(it1.get("rows").toString(), (it1.getTimestamp("time") as Timestamp).toDate()
-                    )
+                    Bus(it1.get("rows").toString(), it1.getTimestamp("time") as Timestamp)
                 )
                 Log.d("KKK", bufstop.name)
                 Log.d("KKK", bufstop.buses.size.toString())
@@ -99,12 +90,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //initializeData()
+        //Считывание данных из БД
         readBusstops(){
-            Log.d("III", busStops.size.toString())
             for (bs in busStops) {
-                Log.d("III", bs.name)
-                Log.d("III", bs.buses.size.toString())
                 readBus(bs)
             }
             mMap.setOnMarkerClickListener(this)
